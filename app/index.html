@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fault Plate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --foreground: #2a2a2a;
+      --card: #ffffff;
+      --muted: #f5f5f4;
+      --muted-foreground: #6f6f6e;
+      --primary: #2f2f2f;
+      --slate: #5f7080;
+      --field: #f4f4f3;
+      --placeholder: #a3a3a1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 24px;
+      color: var(--foreground);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      background-color: #dcdcdc;
+      background-image: linear-gradient(180deg, #ececeb 0%, #e3e3e2 48%, #d8d8d7 100%);
+      background-attachment: fixed;
+    }
+    .card {
+      width: 520px;
+      max-width: 100%;
+      padding: 36px;
+      border-radius: 16px;
+      background: var(--card);
+      box-shadow:
+        0 1px 2px rgba(38, 38, 38, 0.04),
+        0 10px 20px -12px rgba(38, 38, 38, 0.1),
+        0 40px 70px -40px rgba(38, 38, 38, 0.22);
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    form { margin-top: 28px; display: flex; flex-direction: column; gap: 18px; }
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+    }
+    .field {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      background: var(--field);
+      padding: 0 14px;
+      font: inherit;
+      font-size: 14px;
+      color: var(--foreground);
+    }
+    .field::placeholder { color: var(--placeholder); }
+    input.field { height: 44px; }
+    textarea.field { height: 112px; padding-top: 12px; resize: none; }
+    .field:focus {
+      outline: none;
+      background: var(--card);
+      box-shadow: 0 0 0 2px rgba(47, 47, 47, 0.45);
+    }
+    .choices { display: flex; gap: 8px; height: 44px; }
+    .choice {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--slate);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--muted-foreground);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .choice input { position: absolute; opacity: 0; }
+    .choice.selected {
+      background: var(--slate);
+      color: #ffffff;
+    }
+    button {
+      margin-top: 4px;
+      height: 44px;
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #ffffff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    button:hover { opacity: 0.9; }
+    .saved {
+      display: none;
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 10px;
+      background: var(--muted);
+    }
+    .saved h2 {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+    }
+    .row {
+      display: flex;
+      gap: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(42, 42, 42, 0.08);
+      font-size: 13px;
+    }
+    .row:last-child { border-bottom: 0; }
+    .row dt { width: 150px; flex-shrink: 0; color: var(--muted-foreground); }
+    .row dd { margin: 0; flex: 1; font-size: 14px; overflow-wrap: anywhere; }
+    .error { margin-top: 12px; color: #8a3b3b; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Fault Plate</h1>
+    <form id="plate-form">
+      <div>
+        <label class="label" for="name">Name</label>
+        <input class="field" id="name" name="name" required placeholder="e.g. Payment authorization failed">
+      </div>
+      <div>
+        <label class="label" for="message">User-facing message</label>
+        <textarea class="field" id="message" name="user_facing_message" required placeholder="e.g. We couldn't complete your payment. Please check your card details."></textarea>
+      </div>
+      <div>
+        <label class="label" for="status">HTTP status</label>
+        <input class="field" id="status" name="http_status" required inputmode="numeric" pattern="[0-9]{3}" placeholder="e.g. 400, 404, 500">
+      </div>
+      <div>
+        <label class="label" for="log-fields">Log fields</label>
+        <input class="field" id="log-fields" name="log_fields" required placeholder="e.g. order_id, user_id, amount">
+      </div>
+      <div>
+        <span class="label">Retry allowed</span>
+        <div class="choices">
+          <label class="choice" id="choice-yes">
+            <input type="radio" name="retry_allowed" value="retryable">
+            Retryable
+          </label>
+          <label class="choice selected" id="choice-no">
+            <input type="radio" name="retry_allowed" value="not_retryable" checked>
+            Not retryable
+          </label>
+        </div>
+      </div>
+      <button type="submit">Save plate</button>
+      <p class="error" id="error" hidden></p>
+    </form>
+    <section class="saved" id="saved">
+      <h2>Saved plate</h2>
+      <dl>
+        <div class="row"><dt>Name</dt><dd id="out-name"></dd></div>
+        <div class="row"><dt>User-facing message</dt><dd id="out-message"></dd></div>
+        <div class="row"><dt>HTTP status</dt><dd id="out-status"></dd></div>
+        <div class="row"><dt>Log fields</dt><dd id="out-logs"></dd></div>
+        <div class="row"><dt>Retry allowed</dt><dd id="out-retry"></dd></div>
+      </dl>
+    </section>
+  </main>
+  <script>
+    const yes = document.getElementById("choice-yes");
+    const no = document.getElementById("choice-no");
+    function markChoice() {
+      const selected = document.querySelector("input[name=retry_allowed]:checked").value;
+      yes.classList.toggle("selected", selected === "retryable");
+      no.classList.toggle("selected", selected === "not_retryable");
+    }
+    yes.querySelector("input").addEventListener("change", markChoice);
+    no.querySelector("input").addEventListener("change", markChoice);
+
+    document.getElementById("plate-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const error = document.getElementById("error");
+      error.hidden = true;
+      const form = event.target;
+      const body = {
+        name: form.name.value,
+        user_facing_message: form.user_facing_message.value,
+        http_status: Number(form.http_status.value),
+        log_fields: form.log_fields.value,
+        retry_allowed: form.retry_allowed.value,
+      };
+      const response = await fetch("/plates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        error.hidden = false;
+        error.textContent = "Save failed.";
+        return;
+      }
+      const plate = await response.json();
+      document.getElementById("out-name").textContent = plate.name;
+      document.getElementById("out-message").textContent = plate.user_facing_message;
+      document.getElementById("out-status").textContent = plate.http_status;
+      document.getElementById("out-logs").textContent = plate.log_fields;
+      document.getElementById("out-retry").textContent =
+        plate.retry_allowed === "retryable" ? "Retryable" : "Not retryable";
+      document.getElementById("saved").style.display = "block";
+    });
+  </script>
+</body>
+</html>

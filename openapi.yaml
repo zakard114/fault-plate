@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: Fault Plate API
+  version: 1.0.0
+paths:
+  /plates:
+    post:
+      summary: 실패 규격 한 장 생성
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - user_facing_message
+                - http_status
+                - log_fields
+                - retry_allowed
+              properties:
+                name:
+                  type: string
+                  description: 이 실패의 고유 이름
+                user_facing_message:
+                  type: string
+                  description: 사용자에게 보여줄 친절한 안내 문구
+                http_status:
+                  type: integer
+                  description: HTTP 상태 코드 (예 400, 500)
+                log_fields:
+                  type: string
+                  description: 서버 로그에 남길 필드 항목
+                retry_allowed:
+                  type: string
+                  enum: [retryable, not_retryable]
+                  description: 다시 시도 가능 여부
+      responses:
+        '201':
+          description: 성공적으로 생성된 실패 규격
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  user_facing_message:
+                    type: string
+                  http_status:
+                    type: integer
+                  log_fields:
+                    type: string
+                  retry_allowed:
+                    type: string
+    get:
+      summary: 저장된 실패 규격 한 장 조회
+      responses:
+        '200':
+          description: 저장된 한 장
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  user_facing_message:
+                    type: string
+                  http_status:
+                    type: integer
+                  log_fields:
+                    type: string
+                  retry_allowed:
+                    type: string
+        '404':
+          description: 저장된 장이 없음
+
+
+
