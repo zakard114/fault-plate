@@ -7,6 +7,9 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -14,6 +17,35 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: pytest
+      - name: Record the production deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'production',
+              description: 'Production deploy',
+              auto_merge: false,
+              required_contexts: [],
+              production_environment: true,
+            });
+            const deploymentId = result.data.id;
+            if (!deploymentId) {
+              core.setFailed('GitHub did not record the production deployment.');
+              return;
+            }
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deploymentId,
+              state: 'success',
+              environment: 'production',
+              description: 'Production deploy recorded.',
+              log_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            });
+            core.info(`Recorded production deployment ${deploymentId} for ${context.sha}.`);
       - name: Deploy production only after this manual run
         env:
           RENDER_PRODUCTION_DEPLOY_HOOK_URL: ${{ secrets.RENDER_PRODUCTION_DEPLOY_HOOK_URL }}
@@ -21,5 +53,5 @@ jobs:
           if [ -n "$RENDER_PRODUCTION_DEPLOY_HOOK_URL" ]; then
             curl -fsS -X POST "$RENDER_PRODUCTION_DEPLOY_HOOK_URL"
           else
-            echo "Tests passed. Deploy this commit from the Render dashboard with Manual Deploy."
+            echo "Production was recorded. The live Render service is unchanged until a production hook is added."
           fi

@@ -205,7 +205,7 @@ The reviewer subagent only checks the five fields. When `GET /plates` returns 40
 
 ## CI/CD
 
-Pull requests run `pytest` only. A push to `main` runs `pytest` and then the dev deploy (Render auto-deploy of `main`, or the deploy hook if `RENDER_DEPLOY_HOOK_URL` is set). Production never runs on push. A person must start the production workflow (`.github/workflows/production.yml`), which runs `pytest` again and deploys only when `RENDER_PRODUCTION_DEPLOY_HOOK_URL` is set. Otherwise it stops after tests and tells the person to use Render Manual Deploy. The tasks and acceptance criteria are in [`docs/tracker.md`](docs/tracker.md).
+Pull requests run `pytest` only. A push to `main` runs `pytest`, then the `deploy-dev` job records a GitHub deployment with environment name `dev`. That record is the dev deploy. Render auto-deploy of `main` remains the dev host https://fault-plate.onrender.com. If `RENDER_DEPLOY_HOOK_URL` is set, that job POSTs the hook. If it is not set, the job still succeeds. Production never runs on push. A person must start `.github/workflows/production.yml` (`workflow_dispatch` only). That workflow runs `pytest`, then records a GitHub deployment with environment name `production`. If `RENDER_PRODUCTION_DEPLOY_HOOK_URL` is set, it POSTs that hook after the tests. If it is not set, the job still succeeds as the manual production deployment record, and the step log says production was recorded and the live Render service is unchanged until a production hook is added. There is no second public URL. The tasks and acceptance criteria are in [`docs/tracker.md`](docs/tracker.md).
 
 [↑ Contents](#table-of-contents)
 
