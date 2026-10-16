@@ -127,6 +127,12 @@ Live card: https://fault-plate.onrender.com
 
 The card has Name, User-facing message, HTTP status, Log fields, Retry allowed, and Save plate. After a save, Saved plate on the same screen shows the five stored values.
 
+![Saved plate on the same screen](docs/images/saved-plate.png)
+
+Local check at `127.0.0.1:8000`, after Save plate:
+
+![Saved plate at 127.0.0.1:8000](docs/images/local-address.png)
+
 ## What was built
 
 | Step | Evidence |
