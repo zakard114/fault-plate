@@ -39,3 +39,4 @@ Files read: `app/main.py`, `app/index.html`, `agent-capabilities/permissions.md`
 - `get_plate` and `fetch_plate.py` call `GET /plates` only.
 - The public list did not include the local notes.
 - `POST /plates` has no login, so one saved card can be replaced. This product records that limit and does not add login.
+- `GET /ops` and `GET /metrics` show the path, status, duration, and trace id. They do not show the card text.

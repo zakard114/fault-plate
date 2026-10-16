@@ -75,6 +75,18 @@ paths:
                     type: string
         '404':
           description: 저장된 장이 없음
+  /alerts:
+    get:
+      summary: Active and recent alerts
+      responses:
+        '200':
+          description: Alert rows without card text
+  /ops:
+    get:
+      summary: Request signals and alerts
+      responses:
+        '200':
+          description: HTML table of trace id, path, status, and duration
 
 
 
