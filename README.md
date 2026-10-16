@@ -1,7 +1,5 @@
 # Fault Plate
 
-![Saved plate on the same screen](docs/images/saved-plate.png)
-
 **One specification card for one API failure.** The sentence a caller reads and the record the server keeps are written once, on the same card.
 
 **Live app:** https://fault-plate.onrender.com
@@ -207,9 +205,7 @@ The reviewer subagent only checks the five fields. When `GET /plates` returns 40
 
 ## CI/CD
 
-`.github/workflows/ci.yml` runs `pytest` on every pull request and on every push to `main`. The `deploy-dev` job runs only after those tests pass on `main`. That job is the dev deploy. Render auto-deploy of `main` is the dev service.
-
-Production does not run on push. A person starts `.github/workflows/production.yml`. Tests run again, and only that manual run deploys production. The tasks and acceptance criteria are in [`docs/tracker.md`](docs/tracker.md).
+Pull requests run `pytest` only. A push to `main` runs `pytest` and then the dev deploy (Render auto-deploy of `main`, or the deploy hook if `RENDER_DEPLOY_HOOK_URL` is set). Production never runs on push. A person must start the production workflow (`.github/workflows/production.yml`), which runs `pytest` again and deploys only when `RENDER_PRODUCTION_DEPLOY_HOOK_URL` is set. Otherwise it stops after tests and tells the person to use Render Manual Deploy. The tasks and acceptance criteria are in [`docs/tracker.md`](docs/tracker.md).
 
 [↑ Contents](#table-of-contents)
 

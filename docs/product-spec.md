@@ -16,4 +16,4 @@ When an API fails, the sentence the caller reads and the record the server keeps
 
 ## Tracker
 
-[`docs/tracker.md`](tracker.md) is the public task tracker. Each row has an acceptance criterion and the test that closed it. The builder used FP-1, FP-2, and FP-3 while adding those tests.
+The public task tracker is the GitHub Issues [FP-1](https://github.com/zakard114/fault-plate/issues/1), [FP-2](https://github.com/zakard114/fault-plate/issues/2), and [FP-3](https://github.com/zakard114/fault-plate/issues/3). [`docs/tracker.md`](tracker.md) lists the same acceptance criteria and the tests that satisfy them. The builder used those issues while adding the tests: comments cite `tests/test_plates.py`, `tests/test_oncall.py`, and commit `4402ed8`.
