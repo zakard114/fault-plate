@@ -15,3 +15,19 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: pytest
+
+  deploy-dev:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Deploy the dev service
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+          else
+            echo "Dev deploy is Render auto-deploy of main."
+          fi

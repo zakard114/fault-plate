@@ -201,17 +201,15 @@ Reviewed on 2026-10-11. Details: [`docs/SECURITY.md`](docs/SECURITY.md).
 
 The roles and the handoff are in [`docs/team.md`](docs/team.md). The project instructions in [`AGENTS.md`](AGENTS.md) point at that file, [`docs/workflow.md`](docs/workflow.md), and [`docs/product-spec.md`](docs/product-spec.md).
 
-The reviewer subagent only checks the five fields. The on-call agent in `custom-agent/agent.py` runs when `saved_plate_unavailable` is active and posts the runbook card.
+The reviewer subagent only checks the five fields. When `GET /plates` returns 404, the alert `saved_plate_unavailable` opens and the on-call agent wakes on its own and writes the runbook card. `custom-agent/agent.py` is the same repair run by hand.
 
 [↑ Contents](#table-of-contents)
 
 ## CI/CD
 
-`.github/workflows/ci.yml` runs `pytest` on every pull request and on every push to `main`.
+`.github/workflows/ci.yml` runs `pytest` on every pull request and on every push to `main`. The `deploy-dev` job runs only after those tests pass on `main`. That job is the dev deploy. Render auto-deploy of `main` is the dev service.
 
-Render deploys `main` automatically after that push. That is the development deploy.
-
-Production stays manual. Run the `production` workflow from GitHub, then deploy the same commit in the Render dashboard with Manual Deploy. This project has one free web service, so there is not a second production cluster.
+Production does not run on push. A person starts `.github/workflows/production.yml`. Tests run again, and only that manual run deploys production. The tasks and acceptance criteria are in [`docs/tracker.md`](docs/tracker.md).
 
 [↑ Contents](#table-of-contents)
 

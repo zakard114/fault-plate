@@ -16,4 +16,4 @@ When an API fails, the sentence the caller reads and the record the server keeps
 
 ## Tracker
 
-GitHub Issues on https://github.com/zakard114/fault-plate/issues are the public task tracker. One issue covers one acceptance criterion above. The builder closes an issue only after `pytest` passes for that criterion.
+[`docs/tracker.md`](tracker.md) is the public task tracker. Each row has an acceptance criterion and the test that closed it. The builder used FP-1, FP-2, and FP-3 while adding those tests.

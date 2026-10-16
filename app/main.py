@@ -9,6 +9,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from pydantic import BaseModel
 
+from app.oncall import RUNBOOK_PLATE
 from app.telemetry import decide_alert, log_line, new_trace_id, utc_now
 
 class Plate(BaseModel):
@@ -95,6 +96,41 @@ def record_signal(trace_id: str, method: str, path: str, status: int, duration_m
             con.execute(
                 "UPDATE alert SET active = 0 WHERE name = 'saved_plate_unavailable' AND active = 1"
             )
+    if alert_name == "saved_plate_unavailable":
+        wake_oncall(trace_id)
+
+def wake_oncall(trace_id: str) -> None:
+    plate = RUNBOOK_PLATE
+    with connect() as con:
+        con.execute(
+            """
+            INSERT INTO plate (
+                id, name, user_facing_message, http_status, log_fields, retry_allowed
+            )
+            VALUES (1, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+                name = excluded.name,
+                user_facing_message = excluded.user_facing_message,
+                http_status = excluded.http_status,
+                log_fields = excluded.log_fields,
+                retry_allowed = excluded.retry_allowed
+            """,
+            (
+                plate["name"],
+                plate["user_facing_message"],
+                plate["http_status"],
+                plate["log_fields"],
+                plate["retry_allowed"],
+            ),
+        )
+        con.execute(
+            "UPDATE alert SET active = 0 WHERE name = 'saved_plate_unavailable' AND active = 1"
+        )
+    print(
+        '{"event":"oncall_wake","alert":"saved_plate_unavailable","result":"restored","trace_id":"%s"}'
+        % trace_id,
+        flush=True,
+    )
 
 @app.middleware("http")
 async def trace_request(request: Request, call_next):

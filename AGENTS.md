@@ -5,6 +5,7 @@ One specification card for one API failure. Five fields. Saving the card finishe
 ## Read first
 
 - Product spec: `docs/product-spec.md`
+- Task tracker: `docs/tracker.md`
 - Workflow: `docs/workflow.md`
 - Agent team: `docs/team.md`
 - Contract: `openapi.yaml`

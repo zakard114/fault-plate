@@ -15,5 +15,5 @@ Four roles work on one card. They do not share one chat.
 2. The builder implements only that spec and runs `pytest`.
 3. The reviewer subagent checks the result without editing files.
 4. If the public `GET /plates` is 404, the alert `saved_plate_unavailable` opens.
-5. The on-call agent in `custom-agent/agent.py` reads that alert and posts the runbook card.
+5. The on-call agent wakes inside the service when `saved_plate_unavailable` is opened and writes the runbook card. `python custom-agent/agent.py` is the same repair if it is run by hand.
 6. A person checks the diff before it is pushed.
