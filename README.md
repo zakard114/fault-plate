@@ -229,7 +229,15 @@ The reviewer subagent only checks the five fields. When `GET /plates` returns 40
 
 ## CI/CD
 
-Pull requests run `pytest` only. A push to `main` runs `pytest`, then the `deploy-dev` job records a GitHub deployment with environment name `dev`. That record is the dev deploy. Render auto-deploy of `main` remains the dev host https://fault-plate.onrender.com. If `RENDER_DEPLOY_HOOK_URL` is set, that job POSTs the hook. If it is not set, the job still succeeds. Production never runs on push. A person must start `.github/workflows/production.yml` (`workflow_dispatch` only). That workflow runs `pytest`, then records a GitHub deployment with environment name `production`. If `RENDER_PRODUCTION_DEPLOY_HOOK_URL` is set, it POSTs that hook after the tests. If it is not set, the job still succeeds as the manual production deployment record, and the step log says production was recorded and the live Render service is unchanged until a production hook is added. There is no second public URL. The tasks and acceptance criteria are in [`docs/tracker.md`](docs/tracker.md).
+Pull requests run `pytest` only. A push to `main` runs `pytest`, then the `deploy-dev` job records a GitHub deployment with environment name `dev`. That record is the dev deploy. Render auto-deploy of `main` remains the dev host https://fault-plate.onrender.com. If `RENDER_DEPLOY_HOOK_URL` is set, that job POSTs the hook. If it is not set, the job still succeeds. Production never runs on push. A person must start `.github/workflows/production.yml` (`workflow_dispatch` only). That workflow runs `pytest`, then records a GitHub deployment with environment name `production`. If `RENDER_PRODUCTION_DEPLOY_HOOK_URL` is set, it POSTs that hook after the tests. If it is not set, the job still succeeds as the manual production deployment record. There is no second public URL. The tasks and acceptance criteria are in [`docs/tracker.md`](docs/tracker.md).
+
+GitHub Actions run [production #1](https://github.com/zakard114/fault-plate/actions/runs/39019693551) was manually triggered on `main` at commit `2270f3a` and finished Success in 19s.
+
+![GitHub Actions run production #1](docs/images/production-workflow.png)
+
+The Render deploys list shows that same commit twice. The later row trigger is Deploy Hook (Deployed, about 24s) and the earlier row of the same commit is Auto-Deploy. That Deploy Hook row is the manual production run updating https://fault-plate.onrender.com.
+
+![Render deploys list for commit 2270f3a](docs/images/render-deploy-hook.png)
 
 [↑ Contents](#table-of-contents)
 
