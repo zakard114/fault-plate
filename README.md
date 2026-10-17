@@ -20,6 +20,7 @@ This app does not detect a live payment failure and pull the card by itself. The
 - [Problem](#problem)
 - [Status](#status)
 - [Quick start](#quick-start)
+- [Warnings](#warnings)
 - [Architecture](#architecture)
 - [Decisions and trade-offs](#decisions-and-trade-offs)
 - [Project structure](#project-structure)
@@ -64,22 +65,33 @@ Free instances sleep when idle, and the SQLite file on that instance can disappe
 
 Commands assume the repository root after clone.
 
+Create the virtual environment and install dependencies once:
+
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+```
+
+1. In PowerShell window A, from the repository root, start the server and leave that window open:
+
+```powershell
 uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open http://127.0.0.1:8000/ . Save the five fields. The same screen shows the saved card.
+Wait until it says `Uvicorn running on http://127.0.0.1:8000`. A blue marker or a blinking cursor means that window is still running. Do not type the next command there.
 
-Read the stored card:
+2. In the browser at http://127.0.0.1:8000/ save the five fields. The same screen shows Saved plate. That is only the screen check.
+
+3. In PowerShell window B, read the stored card:
 
 ```powershell
-Invoke-WebRequest http://127.0.0.1:8000/plates
+curl.exe -i http://127.0.0.1:8000/plates
 ```
 
-Tests:
+Success is a line `HTTP/1.1 200` and a JSON body whose five fields match the Saved plate. The screen label Not retryable is the JSON value `not_retryable`. `curl.exe` without `-i` prints only the JSON body. That body alone also means the read succeeded, but `-i` is the command that shows 200.
+
+4. `pytest` does not need the server. `6 passed` is success. It may sit on the line `collecting 0 items` before the count appears. The two `DeprecationWarning` lines about `on_event` are not failures.
 
 ```powershell
 pytest
@@ -94,6 +106,18 @@ docker compose up --build
 ```
 
 The compose file publishes port 8000 and mounts `./data` so the SQLite file survives a container restart.
+
+[↑ Contents](#table-of-contents)
+
+## Warnings
+
+Do not use `Invoke-WebRequest` or `$r.StatusCode` / `$r.Content` for this check. On Windows PowerShell those members can print blank lines even after the assignment, so it looks like no data.
+
+If that request sits with a blinking cursor and no output, the server is not answering. Press Ctrl+C. Start window A first.
+
+`curl: (7) Failed to connect to 127.0.0.1 port 8000` means window A is not running. Start uvicorn, wait for `Uvicorn running`, then run `curl.exe -i` again in window B.
+
+`pytest` is not where the 200 appears.
 
 [↑ Contents](#table-of-contents)
 
